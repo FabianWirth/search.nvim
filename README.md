@@ -1,6 +1,6 @@
 # search.nvim
 
-search.nvim is a Neovim plugin that enhances the functionality of the Telescope plugin by providing a tab-based search experience. It allows you to seamlessly switch between different search modes within the Telescope window using tabs.
+**search.nvim** is a Neovim plugin that enhances the functionality of the Telescope plugin by providing a tab-based search experience. It allows you to seamlessly switch between different search modes within the Telescope window using tabs.
 
 ## Features
 
@@ -59,7 +59,7 @@ For example:
 ```
 ## License
 
-This plugin is licensed under the MIT License. See the #[LICENSE](/LICENSE.md) file for details.
+This plugin is licensed under the MIT License. See the [LICENSE](/LICENSE.md) file for details.
 
 -------------------------------------------------------------------------------
 
