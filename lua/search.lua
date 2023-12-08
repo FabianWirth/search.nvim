@@ -64,17 +64,6 @@ local tab_window = function(telescope_win_id)
 	})
 end
 
-local set_keymap = function()
-	-- now we bind our tab key to the next tab
-	local opts = { noremap = true, silent = true }
-	local cmd = "<cmd>lua require('search').next_tab()<CR>"
-	local cmd_p = "<cmd>lua require('search').previous_tab()<CR>"
-	vim.api.nvim_buf_set_keymap(0, 'n', "<Tab>", cmd, opts)
-	vim.api.nvim_buf_set_keymap(0, 'i', "<Tab>", cmd, opts)
-	vim.api.nvim_buf_set_keymap(0, 'n', "<S-Tab>", cmd_p, opts)
-	vim.api.nvim_buf_set_keymap(0, 'i', "<S-Tab>", cmd_p, opts)
-end
-
 
 --- opens the telescope window and sets the prompt to the one that was used before
 --- @param tab table the table that contains the information about the tab
@@ -98,12 +87,13 @@ local open_telescope = function(tab, prompt)
 		end,
 		function()
 			local current_win_id = vim.api.nvim_get_current_win()
-			set_keymap()
+			require("util").set_keymap()
 
 			-- now we set the prompt to the one we had before
 			vim.api.nvim_feedkeys(prompt, 't', true)
 
 			vim.schedule(function()
+				-- we need to wait for the prompt to be set
 				tab_window(current_win_id)
 			end)
 		end,
@@ -206,16 +196,15 @@ end
 M.reset = function()
 	M.current_prompt = ""
 	M.active_tab = 1
+	M.opened_on_win = -1
 end
 
-M.opened_on_win = -1
 
 --- opens the telescope window with the current prompt
 --- this is the function that should be called from the outside
 M.open = function()
-	M.opened_on_win = vim.api.nvim_get_current_win()
-	print(M.opened_on_win)
 	M.reset()
+	M.opened_on_win = vim.api.nvim_get_current_win()
 	M.open_internal()
 end
 
