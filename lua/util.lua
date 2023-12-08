@@ -9,16 +9,16 @@ M.await_time = 10
 --- @param max_ms number the maximum amount of milliseconds to wait
 --- @return any the return value of the callback
 M.do_when = function(condition, callback, max_ms)
-	if condition() then
-		return callback()
-	else
-		vim.defer_fn(function()
-			max_ms = max_ms - M.await_time
-			if max_ms < 0 then
-				return
-			end
-			return M.do_when(condition, callback, max_ms)
-		end, M.await_time)
+	if max_ms == nil then
+		max_ms = 1000
+	end
+
+	while max_ms > 0 do
+		if condition() then
+			return callback()
+		end
+		vim.wait(M.await_time)
+		max_ms = max_ms - M.await_time
 	end
 end
 
