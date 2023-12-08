@@ -72,7 +72,7 @@ require("search").setup({
 ```
 ## License
 
-This plugin is licensed under the MIT License. See the [LICENSE](/LICENSE.md) file for details.
+This plugin is licensed under the MIT License. See the [LICENSE](https://github.com/FabianWirth/search.nvim?tab=MIT-1-ov-file) file for details.
 
 -------------------------------------------------------------------------------
 
