@@ -59,10 +59,15 @@ local open_telescope = function(tab, prompt)
 	end
 
 	-- then we spawn the telescope window
-	pcall(tab.tele_func, {
+	local c = pcall(tab.tele_func, {
 		prompt_title = tab.name,
 		layout_strategy = "vertical",
 	})
+	if not c then
+		print(vim.inspect(tab))
+		print("Could not open telescope window")
+		print(vim.inspect(c))
+	end
 	-- find a better way to do this
 	-- we might need to wait for the telescope window to open
 	util.do_when(function()
@@ -122,6 +127,9 @@ end
 --- opens the telescope window with the current prompt
 M.open_internal = function()
 	local active_tab = M.get_active_tab()
+	if util.cannot_open(active_tab) then
+		return M.next_tab()
+	end
 
 	open_telescope(active_tab, M.current_prompt)
 end
@@ -140,6 +148,11 @@ M.open = function(opts)
 	M.reset(opts and opts.tab_id)
 	M.opened_on_win = vim.api.nvim_get_current_win()
 	M.open_internal()
+end
+
+-- configuration
+M.setup = function(opts)
+	settings.setup(opts)
 end
 
 return M

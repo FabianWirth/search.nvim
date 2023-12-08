@@ -109,8 +109,8 @@ M.make_tabline = function(tabs, active_tab, buf_id)
 		end
 		if tab.available ~= nil and not tab.available() then
 			table.insert(inactive_tabs, {
-							s = total_len,
-							e = total_len + #tab_name,
+				s = total_len,
+				e = total_len + #tab_name,
 			})
 		end
 		total_len = total_len + len
@@ -127,5 +127,15 @@ M.make_tabline = function(tabs, active_tab, buf_id)
 	for _, tab in ipairs(inactive_tabs) do
 		vim.api.nvim_buf_add_highlight(buf_id, -1, "InactiveSearchTab", 0, tab.s, tab.e)
 	end
+end
+
+M.cannot_open = function(tab)
+	if tab == nil then
+		return true
+	end
+	if tab.available ~= nil and not tab.available() then
+		return true
+	end
+	return false
 end
 return M;
