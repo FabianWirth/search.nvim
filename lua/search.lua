@@ -1,40 +1,23 @@
 local M = {}
 
 local util = require('util')
+local settings = require('settings')
 
 --- opens the tab window and anchors it to the telescope window
+--- @param telescope_win_id number the id of the telescope window
+--- @return nil
 local tab_window = function(telescope_win_id)
 	-- Calculate the height of Telescope's search fields
 	local telescope_width = vim.fn.winwidth(telescope_win_id) -- Adjust this based on Telescope's window ID
 
 	-- Define the content for the floating window
-	local content_s = ""
-
-	local active_symbol_start = '> '
-	local active_symbol_end = ' <'
-	local inactive_symbol_start = '  '
-	local inactive_symbol_end = '  '
-	local separator = '|'
-
-	for _, tab in ipairs(require("settings").tabs) do
-		local tab_name = tab.name
-		local start_symbol = tab.id == M.active_tab and active_symbol_start or inactive_symbol_start
-		local end_symbol = tab.id == M.active_tab and active_symbol_end or inactive_symbol_end
-		content_s = content_s .. start_symbol .. tab_name .. end_symbol .. separator
-	end
-
-	-- Remove trailing separator
-	content_s = content_s:sub(1, -(#separator))
-
-
-	local content = { content_s }
 
 	-- Set up the floating window configuration
 	local config = {
 		relative = 'win',
 		win = telescope_win_id,
 		width = telescope_width,
-		height = #content,
+		height = 1,
 		col = 0,
 		row = 2, -- Set the row position based on Telescope's height
 		style = 'minimal',
@@ -45,8 +28,8 @@ local tab_window = function(telescope_win_id)
 	-- Create a new buffer
 	local new_buf = vim.api.nvim_create_buf(false, true)
 
-	-- Set the content of the new buffer
-	vim.api.nvim_buf_set_lines(new_buf, 0, -1, false, content)
+	-- write the tabline to the buffer
+	util.make_tabline(settings.tabs, M.active_tab, new_buf)
 
 	local new_win = vim.api.nvim_open_win(new_buf, false, config)
 
@@ -76,7 +59,7 @@ local open_telescope = function(tab, prompt)
 	end
 
 	-- then we spawn the telescope window
-	local c = pcall(tab.tele_func, {
+	pcall(tab.tele_func, {
 		prompt_title = tab.name,
 		layout_strategy = "vertical",
 	})
@@ -87,17 +70,17 @@ local open_telescope = function(tab, prompt)
 		end,
 		function()
 			local current_win_id = vim.api.nvim_get_current_win()
-			require("util").set_keymap()
+			util.set_keymap()
 
 			-- now we set the prompt to the one we had before
 			vim.api.nvim_feedkeys(prompt, 't', true)
 
-			vim.schedule(function()
+			vim.defer_fn(function()
 				-- we need to wait for the prompt to be set
 				tab_window(current_win_id)
-			end)
+			end, 4)
 		end,
-		1000 -- wait for 1 second at most
+		2000 -- wait for 2 second at most
 	)
 end
 
@@ -110,29 +93,7 @@ M.active_tab = 1
 --- switches to the next tab, preserving the prompt
 --- only switches to tabs that are available
 M.next_tab = function()
-	local current_tab = M.active_tab
-	local tabs = require('settings').tabs
-
-	local next_tab = nil
-	while next_tab == nil do
-		current_tab = current_tab + 1
-		if current_tab > #tabs then
-			current_tab = 1
-		end
-		if current_tab == M.active_tab then
-			-- we have looped through all tabs and none is available
-			-- so we error out
-			error("No tab available")
-		end
-
-		local tab = tabs[current_tab]
-		if tab.available == nil or tab.available() then
-			next_tab = tab
-			break
-		end
-	end
-
-	M.active_tab = next_tab.id
+	M.active_tab = util.next_available(M.active_tab, settings.tabs)
 
 	M.remember_prompt()
 	M.open_internal()
@@ -140,21 +101,7 @@ end
 
 --- switches to the previous tab, preserving the prompt
 M.previous_tab = function()
-	local current_tab = M.active_tab
-	local tabs = require('settings').tabs
-
-	for _ = 1, #tabs do
-		current_tab = current_tab - 1
-		if current_tab < 1 then
-			current_tab = #tabs
-		end
-
-		local tab = tabs[current_tab]
-		if tab.available == nil or tab.available() then
-			M.active_tab = tab.id
-			break
-		end
-	end
+	M.active_tab = util.previous_available(M.active_tab, settings.tabs)
 
 	M.remember_prompt()
 	M.open_internal()
@@ -163,47 +110,34 @@ end
 --- remembers the prompt that was used before
 M.remember_prompt = function()
 	local current_prompt = vim.api.nvim_get_current_line()
-	local without_prefix = string.sub(current_prompt, 3)
+	local without_prefix = string.sub(current_prompt, 3) -- remove the "> " prefix
 	M.current_prompt = without_prefix
-end
-
---- sets the active tab to the given tab id
-M.set_tab = function(tab_id)
-	M.active_tab = tab_id
 end
 
 --- returns the currently active tab
 M.get_active_tab = function()
-	local tabs = require('settings').tabs
-	for _, tab in ipairs(tabs) do
-		if tab.id == M.active_tab then
-			return tab
-		end
-	end
+	return util.find_by_id(M.active_tab, settings.tabs)
 end
 
 --- opens the telescope window with the current prompt
 M.open_internal = function()
-	if M.get_active_tab() == nil then
-		M.active_tab = 1
-	end
 	local active_tab = M.get_active_tab()
 
 	open_telescope(active_tab, M.current_prompt)
 end
 
 --- resets the state of the search module
-M.reset = function()
+M.reset = function(to_tab)
+	M.active_tab = to_tab or settings.initial_tab
 	M.current_prompt = ""
-	M.active_tab = 1
 	M.opened_on_win = -1
 end
 
 
 --- opens the telescope window with the current prompt
 --- this is the function that should be called from the outside
-M.open = function()
-	M.reset()
+M.open = function(opts)
+	M.reset(opts and opts.tab_id)
 	M.opened_on_win = vim.api.nvim_get_current_win()
 	M.open_internal()
 end
