@@ -1,6 +1,7 @@
 # search.nvim
 
-**search.nvim** is a Neovim plugin that enhances the functionality of the Telescope plugin by providing a tab-based search experience. It allows you to seamlessly switch between different search modes within the Telescope window using tabs.
+*"**search.nvim** is a Neovim plugin that enhances the functionality of the Telescope plugin by providing a tab-based search experience. It allows you to seamlessly switch between different search modes within the Telescope window using tabs"* - ChatGPT
+
 ![example](https://github.com/FabianWirth/search.nvim/blob/main/example.gif)
 
 **this plugin is in pre-alpha state**
@@ -28,6 +29,7 @@ the default tabs are:
 - find_files
 - git_files
 - live_grep
+
 they can be configured in the setup function.
 
 ## Usage
@@ -49,11 +51,10 @@ Navigate between tabs using the **`<Tab>`** and **`<S-Tab>`** keys in normal and
 
 ### Customizing Tabs
 You can customize the available tabs by modifying the tabs table in the plugin configuration. Each tab should be defined as a Lua table with the following properties:
-```
-name: Display name of the tab.
-tele_func: The Telescope function associated with the tab.
-available (optional): A function to determine if the tab is currently available based on certain conditions.
-```
+
+- name: Display name of the tab.
+- tele_func: The Telescope function associated with the tab.
+- available (optional): A function to determine if the tab is currently available based on certain conditions.
 For example:
 
 ```lua
