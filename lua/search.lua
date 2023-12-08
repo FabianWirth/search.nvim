@@ -61,7 +61,6 @@ local open_telescope = function(tab, prompt)
 	-- then we spawn the telescope window
 	local c = pcall(tab.tele_func, {
 		prompt_title = tab.name,
-		layout_strategy = "vertical",
 	})
 	if not c then
 		print(vim.inspect(tab))
