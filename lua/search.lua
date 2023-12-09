@@ -10,7 +10,7 @@ local tab_window = function(telescope_win_id)
 	-- Calculate the height of Telescope's search fields
 	local telescope_width = vim.fn.winwidth(telescope_win_id) -- Adjust this based on Telescope's window ID
 	if telescope_width == -1 then
-		telescope_width = vim.fn.winwidth(0)
+		return
 	end
 
 	-- Define the content for the floating window
