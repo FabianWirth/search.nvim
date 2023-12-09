@@ -9,6 +9,9 @@ local settings = require('settings')
 local tab_window = function(telescope_win_id)
 	-- Calculate the height of Telescope's search fields
 	local telescope_width = vim.fn.winwidth(telescope_win_id) -- Adjust this based on Telescope's window ID
+	if telescope_width == -1 then
+		telescope_width = vim.fn.winwidth(0)
+	end
 
 	-- Define the content for the floating window
 
@@ -16,7 +19,7 @@ local tab_window = function(telescope_win_id)
 	local config = {
 		relative = 'win',
 		win = telescope_win_id,
-		width = telescope_width,
+		width = telescope_width or 0,
 		height = 1,
 		col = 0,
 		row = 2, -- Set the row position based on Telescope's height
