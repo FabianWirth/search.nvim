@@ -114,7 +114,8 @@ end
 --- remembers the prompt that was used before
 M.remember_prompt = function()
 	local current_prompt = vim.api.nvim_get_current_line()
-	local without_prefix = string.sub(current_prompt, 3) -- remove the "> " prefix
+	-- removing the prefix, by cutting the length
+	local without_prefix = string.sub(current_prompt, M.prefix_len + 1) 
 	M.current_prompt = without_prefix
 end
 
@@ -140,10 +141,16 @@ M.reset = function(to_tab)
 	M.opened_on_win = -1
 end
 
+-- the prefix can be defined in the telescope config, so we need to read
+-- it's length in the open() method. 
+-- @todo: maybe do the reading somewhere else, to avoid doing so multiple times
+M.prefix_len = 3
 
 --- opens the telescope window with the current prompt
 --- this is the function that should be called from the outside
 M.open = function(opts)
+  local prefix = require("telescope.config").values.prompt_prefix or 3
+  M.prefix_len = #prefix
 	M.reset(opts and opts.tab_id)
 	M.opened_on_win = vim.api.nvim_get_current_win()
 	M.open_internal()
