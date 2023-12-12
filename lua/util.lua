@@ -7,8 +7,10 @@ M.await_time = 10
 --- @param condition function a function that returns a boolean
 --- @param callback function a function that is called when the condition is met
 --- @param max_ms number the maximum amount of milliseconds to wait
+--- @param fail_callback function a function that is called when the condition is not met
 --- @return any the return value of the callback
 M.do_when = function(condition, callback, max_ms)
+M.do_when = function(condition, callback, max_ms, fail_callback)
 	if max_ms == nil then
 		max_ms = 1000
 	end
@@ -20,6 +22,7 @@ M.do_when = function(condition, callback, max_ms)
 		vim.wait(M.await_time)
 		max_ms = max_ms - M.await_time
 	end
+	return fail_callback()
 end
 
 

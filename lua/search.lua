@@ -66,7 +66,8 @@ local open_telescope = function(tab, prompt)
 		prompt_title = tab.name,
 	})
 	if not c then
-		M.next_tab(true)
+		M.busy = false
+		M.continue_tab(true)
 		return
 	end
 	-- find a better way to do this
@@ -84,9 +85,14 @@ local open_telescope = function(tab, prompt)
 			vim.defer_fn(function()
 				-- we need to wait for the prompt to be set
 				tab_window(current_win_id)
+				M.busy = false
 			end, 4)
 		end,
-		2000 -- wait for 2 second at most
+		tab.wait_for or 2000, -- wait for 2 second at most
+		function()
+			M.busy = false
+			M.continue_tab(true)
+		end
 	)
 end
 
@@ -95,10 +101,23 @@ M.current_prompt = ""
 
 --- the currently active tab id
 M.active_tab = 1
+M.busy = false
+
+M.continue_tab = function(force)
+	if M.tab_direction == "next" then
+		M.next_tab(force)
+	else
+		M.previous_tab(force)
+	end
+end
 
 --- switches to the next tab, preserving the prompt
 --- only switches to tabs that are available
 M.next_tab = function(force)
+	if M.busy then
+		return
+	end
+	M.tab_direction = "next"
 	force = force or false
 	M.active_tab = util.next_available(M.active_tab, settings.tabs)
 
@@ -110,6 +129,10 @@ end
 
 --- switches to the previous tab, preserving the prompt
 M.previous_tab = function(force)
+	if M.busy then
+		return
+	end
+	M.tab_direction = "previous"
 	force = force or false
 	M.active_tab = util.previous_available(M.active_tab, settings.tabs)
 
@@ -118,6 +141,9 @@ M.previous_tab = function(force)
 	end
 	M.open_internal()
 end
+
+--- the direction in which the tab should be switched
+M.tab_direction = "next"
 
 --- remembers the prompt that was used before
 M.remember_prompt = function()
@@ -134,6 +160,7 @@ end
 
 --- opens the telescope window with the current prompt
 M.open_internal = function()
+	M.busy = true
 	local active_tab = M.get_active_tab()
 	if util.cannot_open(active_tab) then
 		return M.next_tab()
