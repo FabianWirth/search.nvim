@@ -1,5 +1,7 @@
 local M = {}
 
+local tabs = require('search.tabs')
+
 M.initial_tab = 1
 
 local builtin = require('telescope.builtin')
@@ -36,6 +38,10 @@ M.setup = function(opts)
 	if opts.initial_tab ~= nil then
 		M.initial_tab = opts.initial_tab
 	end
+	tabs.init({
+		tabs = M.tabs,
+		initial_id = M.initial_tab,
+	})
 end
 
 
