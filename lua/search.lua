@@ -66,9 +66,8 @@ local open_telescope = function(tab, prompt)
 		prompt_title = tab.name,
 	})
 	if not c then
-		print(vim.inspect(tab))
-		print("Could not open telescope window")
-		print(vim.inspect(c))
+		M.next_tab(true)
+		return
 	end
 	-- find a better way to do this
 	-- we might need to wait for the telescope window to open
@@ -99,18 +98,24 @@ M.active_tab = 1
 
 --- switches to the next tab, preserving the prompt
 --- only switches to tabs that are available
-M.next_tab = function()
+M.next_tab = function(force)
+	force = force or false
 	M.active_tab = util.next_available(M.active_tab, settings.tabs)
 
-	M.remember_prompt()
+	if not force then
+		M.remember_prompt()
+	end
 	M.open_internal()
 end
 
 --- switches to the previous tab, preserving the prompt
-M.previous_tab = function()
+M.previous_tab = function(force)
+	force = force or false
 	M.active_tab = util.previous_available(M.active_tab, settings.tabs)
 
-	M.remember_prompt()
+	if not force then
+		M.remember_prompt()
+	end
 	M.open_internal()
 end
 
@@ -118,7 +123,7 @@ end
 M.remember_prompt = function()
 	local current_prompt = vim.api.nvim_get_current_line()
 	-- removing the prefix, by cutting the length
-	local without_prefix = string.sub(current_prompt, M.prefix_len + 1) 
+	local without_prefix = string.sub(current_prompt, M.prefix_len + 1)
 	M.current_prompt = without_prefix
 end
 
@@ -145,15 +150,15 @@ M.reset = function(to_tab)
 end
 
 -- the prefix can be defined in the telescope config, so we need to read
--- it's length in the open() method. 
+-- it's length in the open() method.
 -- @todo: maybe do the reading somewhere else, to avoid doing so multiple times
 M.prefix_len = 3
 
 --- opens the telescope window with the current prompt
 --- this is the function that should be called from the outside
 M.open = function(opts)
-  local prefix = require("telescope.config").values.prompt_prefix or 3
-  M.prefix_len = #prefix
+	local prefix = require("telescope.config").values.prompt_prefix or 3
+	M.prefix_len = #prefix
 	M.reset(opts and opts.tab_id)
 	M.opened_on_win = vim.api.nvim_get_current_win()
 	M.open_internal()
