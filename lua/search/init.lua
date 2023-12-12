@@ -1,7 +1,7 @@
 local M = {}
 
-local util = require('util')
-local settings = require('settings')
+local util = require('search.util')
+local settings = require('search.settings')
 
 --- opens the tab window and anchors it to the telescope window
 --- @param telescope_win_id number the id of the telescope window
