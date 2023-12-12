@@ -21,6 +21,7 @@ M.do_when = function(condition, callback, max_ms, fail_callback)
 		vim.wait(M.await_time)
 		max_ms = max_ms - M.await_time
 	end
+
 	return fail_callback()
 end
 
