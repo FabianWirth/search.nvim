@@ -9,7 +9,6 @@ M.await_time = 10
 --- @param max_ms number the maximum amount of milliseconds to wait
 --- @param fail_callback function a function that is called when the condition is not met
 --- @return any the return value of the callback
-M.do_when = function(condition, callback, max_ms)
 M.do_when = function(condition, callback, max_ms, fail_callback)
 	if max_ms == nil then
 		max_ms = 1000
@@ -22,6 +21,7 @@ M.do_when = function(condition, callback, max_ms, fail_callback)
 		vim.wait(M.await_time)
 		max_ms = max_ms - M.await_time
 	end
+
 	return fail_callback()
 end
 
@@ -88,6 +88,8 @@ M.find_by_id = function(id, items)
 	error("Could not find item with id " .. id)
 end
 
+M.failed_tab = -1
+
 --- makes the tabline for the given tabs
 --- @param tabs table a list of tabs
 --- @param active_tab number the id of the active tab
@@ -99,6 +101,7 @@ M.make_tabline = function(tabs, active_tab, buf_id)
 	local active_start = 0
 	local active_end = 0
 	local total_len = 0
+	local failed_tab = nil
 
 	local inactive_tabs = {}
 
@@ -109,6 +112,14 @@ M.make_tabline = function(tabs, active_tab, buf_id)
 		if id == active_tab then
 			active_start = total_len
 			active_end = active_start + #tab_name
+		end
+		if tab.name == M.failed_tab then
+			print("failed tab")
+			failed_tab = {
+				s = total_len,
+				e = total_len + #tab_name,
+			}
+			M.failed_tab = -1
 		end
 		if tab.available ~= nil and not tab.available() then
 			table.insert(inactive_tabs, {
@@ -125,8 +136,12 @@ M.make_tabline = function(tabs, active_tab, buf_id)
 
 	vim.api.nvim_buf_set_lines(buf_id, 0, -1, false, content)
 	vim.cmd("hi ActiveSearchTab guifg=#000000 guibg=#5558b5 gui=bold")
+	vim.cmd("hi FailedSearchTab guifg=#ff9980 gui=bold")
 	vim.cmd("hi InactiveSearchTab guifg=#404040")
 	vim.api.nvim_buf_add_highlight(buf_id, -1, "ActiveSearchTab", 0, active_start, active_end)
+	if failed_tab ~= nil then
+		vim.api.nvim_buf_add_highlight(buf_id, -1, "FailedSearchTab", 0, failed_tab.s, failed_tab.e)
+	end
 	for _, tab in ipairs(inactive_tabs) do
 		vim.api.nvim_buf_add_highlight(buf_id, -1, "InactiveSearchTab", 0, tab.s, tab.e)
 	end

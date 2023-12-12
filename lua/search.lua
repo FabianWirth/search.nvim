@@ -66,6 +66,7 @@ local open_telescope = function(tab, prompt)
 		prompt_title = tab.name,
 	})
 	if not c then
+		util.failed_tab = tab.name
 		M.busy = false
 		M.continue_tab(true)
 		return
@@ -91,6 +92,7 @@ local open_telescope = function(tab, prompt)
 		tab.wait_for or 2000, -- wait for 2 second at most
 		function()
 			M.busy = false
+			util.failed_tab = tab.name
 			M.continue_tab(true)
 		end
 	)
@@ -115,6 +117,7 @@ end
 --- only switches to tabs that are available
 M.next_tab = function(force)
 	if M.busy then
+		print("waiting")
 		return
 	end
 	M.tab_direction = "next"
