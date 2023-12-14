@@ -2,9 +2,9 @@
 
 *"**search.nvim** is a Neovim plugin that enhances the functionality of the [Telescope](https://github.com/nvim-telescope/telescope.nvim) plugin by providing a tab-based search experience. It allows you to seamlessly switch between different search modes within the Telescope window using tabs"* - ChatGPT
 
-![example](https://github.com/FabianWirth/search.nvim/blob/main/example.gif)
+![example](https://raw.githubusercontent.com/FabianWirth/search.nvim/refactor/example.gif)
 
-**this plugin is in pre-alpha state**
+**this plugin is in early development and might have some bugs.**
 
 ## Features
 
@@ -41,9 +41,10 @@ To open the search.nvim window, use the following command:
 require('search').open()
 ```
 This will activate the default tab and open the Telescope window with the specified layout.
-it is also possible to provide a tab_id to directly activate a specific tab
+it is also possible to provide a tab_id or tab_name to directly activate a specific tab (id takes precedence over name)
 ```lua
 require('search').open({ tab_id = 2 })
+require('search').open({ tab_name = 'Grep' })
 ```
 
 ### Switching Tabs
@@ -61,8 +62,8 @@ For example:
 require("search").setup({
   append_tabs = { -- append_tabs will add the provided tabs to the default ones
     {
-      name = "Commits",
-      tele_func = require('telescope.builtin').git_commits,
+      "Commits", -- or name = "Commits"
+      require('telescope.builtin').git_commits, -- or tele_func = require('telescope.builtin').git_commits
       available = function()
         return vim.fn.isdirectory(".git") == 1
       end
