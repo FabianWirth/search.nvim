@@ -10,12 +10,14 @@ local Tab = {}
 --- @field failed boolean
 --- @field wait_for number|nil
 --- @function new create a new tab
-function Tab:new(name, tele_func, is_available, id)
+function Tab:new(tab, id)
+	local name = tab.name or tab[1]
+	local tele_func = tab.tele_func or tab[2]
 	local o = {
 		id = id,
 		name = name,
 		tele_func = tele_func,
-		available_func = is_available,
+		available_func = tab.available,
 		failed = false,
 		waiting = false,
 	}
@@ -44,10 +46,6 @@ function Tab:has_failed()
 	return self.failed
 end
 
-function Tab:tele()
-	self:tele_func()
-end
-
 function Tab:reset_failed()
 	self.failed = false
 end
@@ -66,13 +64,12 @@ function Tab:start_waiting()
 end
 
 --- initialize the tabs module
--- @param opts table with the following keys:
+--- @param opts table with the following keys:
 -- - tabs: list of tabs
 -- - inital_tab: id of the tab to start with
--- @return nil
 M.init = function(opts)
 	for id, t in ipairs(opts.tabs) do
-		local tab = Tab:new(t.name, t.tele_func, t.available, id)
+		local tab = Tab:new(t, id)
 		M.tab_list[id] = tab
 	end
 	M.current_id = opts.initial_id
@@ -127,13 +124,26 @@ end
 --- get the tab with the given name
 --- @param name string the name of the tab
 --- @return Tab|nil # the tab with the given name
-M.find_by_name = function(name)
+M.id_by_name = function(name)
 	for _, tab in ipairs(M.tab_list) do
 		if tab.name == name then
 			return tab
 		end
 	end
 	return nil
+end
+
+--- set the tab with the given name as the current tab
+--- @param name string the name of the tab
+--- @return boolean # true if the tab was found, false otherwise
+M.set_by_name = function(name)
+	local tab = M.id_by_name(name)
+	if tab then
+		M.current_id = tab.id
+		return true
+	end
+
+	return false
 end
 
 M.set_by_id = function(id)

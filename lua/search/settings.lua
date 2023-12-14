@@ -7,19 +7,19 @@ M.initial_tab = 1
 local builtin = require('telescope.builtin')
 M.tabs = {
 	{
-		name = "Files",
-		tele_func = builtin.find_files,
+		"Files",
+		builtin.find_files,
 	},
 	{
-		name = "Git files",
-		tele_func = builtin.git_files,
+		"Git files",
+		builtin.git_files,
 		available = function()
 			return vim.fn.isdirectory(".git") == 1
 		end
 	},
 	{
-		name = "Grep",
-		tele_func = builtin.live_grep,
+		"Grep",
+		builtin.live_grep,
 	},
 }
 

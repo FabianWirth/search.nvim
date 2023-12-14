@@ -158,11 +158,15 @@ end
 
 --- resets the state of the search module
 M.reset = function(opts)
+	opts = opts or {}
 	if opts.tab_id then
 		tabs.set_by_id(opts.tab_id)
+	elseif opts.tab_name then
+		tabs.set_by_name(opts.tab_name)
 	else
 		tabs.initial_tab()
 	end
+
 	M.current_prompt = ""
 	M.opened_on_win = -1
 end
