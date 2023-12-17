@@ -4,7 +4,8 @@
 
 ![example](https://raw.githubusercontent.com/FabianWirth/search.nvim/main/example.gif)
 
-**this plugin is in early development and might have some bugs. You can also expect changes to the configuration api.**
+> [!WARNING]
+> this plugin is in early development and might have some bugs. You can also expect changes to the configuration api.
 
 ## Features
 
@@ -93,6 +94,7 @@ require("search").setup({
 
 ### known issues
 - pickers with more-than-average loading time (like lsp related, or http sending pickers) can feel a bit off, since the UI will wait for them to be ready.
+- heavily custom configured telescope settings (like in many nvim distros) might lead to unexpected errors, please open an issue if you encounter any.
 
 ## License
 
