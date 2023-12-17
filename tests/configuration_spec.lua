@@ -1,5 +1,6 @@
 local init = require('search.init')
 local _tabs = require('search.tabs')
+local _settings = require('search.settings')
 
 local eq = assert.are.same
 
@@ -90,5 +91,24 @@ describe("can configure search.nvim", function()
 		eq('Custom', _tabs.all()[1].name)
 		eq('custom', _tabs.all()[1].tele_func())
 		eq(false, _tabs.all()[1]:is_available())
+	end)
+
+	it("can configure mappings", function()
+		local config = {
+			mappings = {
+				next = '<leader>l',
+				prev = '<leader>h',
+			}
+		}
+
+		init.setup(config)
+		eq('<leader>l', _settings.keys.next)
+		eq('<leader>h', _settings.keys.prev)
+	end)
+
+	it("has default mappings", function()
+		init.setup()
+		eq('<Tab>', _settings.keys.next)
+		eq('<S-Tab>', _settings.keys.prev)
 	end)
 end)

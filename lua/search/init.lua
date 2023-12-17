@@ -83,8 +83,9 @@ local open_telescope = function()
 			-- now we set the prompt to the one we had before
 			vim.api.nvim_feedkeys(prompt, 't', true)
 
+			-- TODO: find a better way to do this - defer_fn will work, but will also cause some kind of redrawing
+			-- using vim.wait(n) does not work
 			vim.defer_fn(function()
-				-- we need to wait for the prompt to be set
 				tab_window(current_win_id)
 				M.busy = false
 			end, 4)
