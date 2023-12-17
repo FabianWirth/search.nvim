@@ -182,6 +182,14 @@ M.opened_on_win = -1
 --- opens the telescope window with the current prompt
 --- this is the function that should be called from the outside
 M.open = function(opts)
+ 
+  -- TODO: find a better way to do this
+	-- this is just a workaround to make sure that the settings are initialized
+	-- if the user did not call setup() themselves
+  if not settings.initialized then
+    settings.setup()
+  end
+
 	local prefix = require("telescope.config").values.prompt_prefix or "> "
 	M.prefix_len = #prefix
 
