@@ -2,7 +2,7 @@
 
 *"**search.nvim** is a Neovim plugin that enhances the functionality of the [Telescope](https://github.com/nvim-telescope/telescope.nvim) plugin by providing a tab-based search experience. It allows you to seamlessly switch between different search modes within the Telescope window using tabs"* - ChatGPT
 
-![example](https://raw.githubusercontent.com/FabianWirth/search.nvim/refactor/example.gif)
+![example](https://raw.githubusercontent.com/FabianWirth/search.nvim/main/example.gif)
 
 **this plugin is in early development and might have some bugs. You can also expect changes to the configuration api.**
 
