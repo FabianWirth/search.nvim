@@ -2,6 +2,8 @@ local M = {}
 
 M.default_initial_tab = 1
 
+M.initialized = false
+
 M.default_keys = {
 	next = "<Tab>",
 	prev = "<S-Tab>",
@@ -71,6 +73,8 @@ M.setup = function(opts)
 		tabs = tabs,
 		initial_id = initial_tab,
 	})
+
+	M.initialized = true
 end
 
 
