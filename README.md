@@ -4,7 +4,7 @@
 
 ![example](https://raw.githubusercontent.com/FabianWirth/search.nvim/refactor/example.gif)
 
-**this plugin is in early development and might have some bugs.**
+**this plugin is in early development and might have some bugs. You can also expect changes to the configuration api.**
 
 ## Features
 
@@ -44,7 +44,7 @@ This will activate the default tab and open the Telescope window with the specif
 it is also possible to provide a tab_id or tab_name to directly activate a specific tab (id takes precedence over name)
 ```lua
 require('search').open({ tab_id = 2 })
-require('search').open({ tab_name = 'Grep' })
+require('search').open({ tab_name = 'Grep' }) -- if multiple tabs are named the same, the first is selected
 ```
 
 ### Switching Tabs
@@ -59,18 +59,37 @@ You can customize the available tabs by modifying the tabs table in the plugin c
 For example:
 
 ```lua
+local builtin = require('telescope.builtin')
 require("search").setup({
   append_tabs = { -- append_tabs will add the provided tabs to the default ones
     {
       "Commits", -- or name = "Commits"
-      require('telescope.builtin').git_commits, -- or tele_func = require('telescope.builtin').git_commits
-      available = function()
+      builtin.git_commits, -- or tele_func = require('telescope.builtin').git_commits
+      available = function() -- optional
         return vim.fn.isdirectory(".git") == 1
       end
+    }
+  },
+  -- its also possible to overwrite the default tabs using the tabs key instead of append_tabs
+  tabs = {
+    {
+		"Files",
+		function(opts)
+			opts = opts or {}
+			if vim.fn.isdirectory(".git") == 1 then
+				builtin.git_files(opts)
+			else
+				builtin.find_files(opts)
+			end
+		end
     }
   }
 })
 ```
+
+### known issues
+- pickers with more-than-average loading time (like lsp related, or http sending pickers) can feel a bit off, since the UI will wait for them to be ready.
+
 ## License
 
 This plugin is licensed under the MIT License. See the [LICENSE](https://github.com/FabianWirth/search.nvim?tab=MIT-1-ov-file) file for details.
