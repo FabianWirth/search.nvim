@@ -2,9 +2,10 @@
 
 *"**search.nvim** is a Neovim plugin that enhances the functionality of the [Telescope](https://github.com/nvim-telescope/telescope.nvim) plugin by providing a tab-based search experience. It allows you to seamlessly switch between different search modes within the Telescope window using tabs"* - ChatGPT
 
-![example](https://github.com/FabianWirth/search.nvim/blob/main/example.gif)
+![example](https://raw.githubusercontent.com/FabianWirth/search.nvim/main/example.gif)
 
-**this plugin is in pre-alpha state**
+> [!WARNING]
+> this plugin is in early development and might have some bugs. You can also expect changes to the configuration api.
 
 ## Features
 
@@ -41,9 +42,10 @@ To open the search.nvim window, use the following command:
 require('search').open()
 ```
 This will activate the default tab and open the Telescope window with the specified layout.
-it is also possible to provide a tab_id to directly activate a specific tab
+it is also possible to provide a tab_id or tab_name to directly activate a specific tab (id takes precedence over name)
 ```lua
 require('search').open({ tab_id = 2 })
+require('search').open({ tab_name = 'Grep' }) -- if multiple tabs are named the same, the first is selected
 ```
 
 ### Switching Tabs
@@ -58,18 +60,42 @@ You can customize the available tabs by modifying the tabs table in the plugin c
 For example:
 
 ```lua
+local builtin = require('telescope.builtin')
 require("search").setup({
+  mappings = { -- optional: configure the mappings for switching tabs (will be set in normal and insert mode(!))
+    next = "<Tab>",
+    prev = "<S-Tab>"
+  },
   append_tabs = { -- append_tabs will add the provided tabs to the default ones
     {
-      name = "Commits",
-      tele_func = require('telescope.builtin').git_commits,
-      available = function()
+      "Commits", -- or name = "Commits"
+      builtin.git_commits, -- or tele_func = require('telescope.builtin').git_commits
+      available = function() -- optional
         return vim.fn.isdirectory(".git") == 1
       end
+    }
+  },
+  -- its also possible to overwrite the default tabs using the tabs key instead of append_tabs
+  tabs = {
+    {
+	  "Files",
+	  function(opts)
+	    opts = opts or {}
+		if vim.fn.isdirectory(".git") == 1 then
+		  builtin.git_files(opts)
+		else
+		  builtin.find_files(opts)
+		end
+	  end
     }
   }
 })
 ```
+
+### known issues
+- pickers with more-than-average loading time (like lsp related, or http sending pickers) can feel a bit off, since the UI will wait for them to be ready.
+- heavily custom configured telescope settings (like in many nvim distros) might lead to unexpected errors, please open an issue if you encounter any.
+
 ## License
 
 This plugin is licensed under the MIT License. See the [LICENSE](https://github.com/FabianWirth/search.nvim?tab=MIT-1-ov-file) file for details.
