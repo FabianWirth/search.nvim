@@ -1,6 +1,7 @@
 local M = {}
 
 local tabs = require("search.tabs")
+local settings = require("search.settings")
 
 --- the amount of milliseconds to wait between checks
 M.await_time = 10
@@ -37,10 +38,10 @@ M.set_keymap = function()
 	local opts = { noremap = true, silent = true }
 	local cmd = "<cmd>lua require('search').next_tab()<CR>"
 	local cmd_p = "<cmd>lua require('search').previous_tab()<CR>"
-	vim.api.nvim_buf_set_keymap(0, 'n', "<Tab>", cmd, opts)
-	vim.api.nvim_buf_set_keymap(0, 'i', "<Tab>", cmd, opts)
-	vim.api.nvim_buf_set_keymap(0, 'n', "<S-Tab>", cmd_p, opts)
-	vim.api.nvim_buf_set_keymap(0, 'i', "<S-Tab>", cmd_p, opts)
+	vim.api.nvim_buf_set_keymap(0, 'n', settings.keys.next, cmd, opts)
+	vim.api.nvim_buf_set_keymap(0, 'i', settings.keys.next, cmd, opts)
+	vim.api.nvim_buf_set_keymap(0, 'n', settings.keys.prev, cmd_p, opts)
+	vim.api.nvim_buf_set_keymap(0, 'i', settings.keys.prev, cmd_p, opts)
 end
 
 --- switches to the next available tab

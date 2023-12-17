@@ -2,6 +2,13 @@ local M = {}
 
 M.default_initial_tab = 1
 
+M.default_keys = {
+	next = "<Tab>",
+	prev = "<S-Tab>",
+}
+
+M.keys = vim.deepcopy(M.default_keys)
+
 local builtin = require('telescope.builtin')
 M.defaults = {
 	{
@@ -41,6 +48,16 @@ M.setup = function(opts)
 	if opts.append_tabs ~= nil then
 		for _, tab in ipairs(opts.append_tabs) do
 			table.insert(tabs, tab)
+		end
+	end
+
+	M.keys = vim.deepcopy(M.default_keys)
+	if opts.mappings ~= nil then
+		if opts.mappings.next ~= nil then
+			M.keys.next = opts.mappings.next
+		end
+		if opts.mappings.prev ~= nil then
+			M.keys.prev = opts.mappings.prev
 		end
 	end
 

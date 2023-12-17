@@ -61,6 +61,10 @@ For example:
 ```lua
 local builtin = require('telescope.builtin')
 require("search").setup({
+  mappings = { -- optional: configure the mappings for switching tabs (will be set in normal and insert mode(!))
+    next = "<Tab>",
+    prev = "<S-Tab>"
+  },
   append_tabs = { -- append_tabs will add the provided tabs to the default ones
     {
       "Commits", -- or name = "Commits"
