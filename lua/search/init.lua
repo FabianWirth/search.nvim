@@ -160,6 +160,12 @@ end
 --- resets the state of the search module
 M.reset = function(opts)
 	opts = opts or {}
+
+	tabs.current_collection_id = "default"
+	if opts.collection then
+		tabs.current_collection_id = opts.collection
+	end
+
 	if opts.tab_id then
 		tabs.set_by_id(opts.tab_id)
 	elseif opts.tab_name then
@@ -182,13 +188,13 @@ M.opened_on_win = -1
 --- opens the telescope window with the current prompt
 --- this is the function that should be called from the outside
 M.open = function(opts)
- 
-  -- TODO: find a better way to do this
+
+	-- TODO: find a better way to do this
 	-- this is just a workaround to make sure that the settings are initialized
 	-- if the user did not call setup() themselves
-  if not settings.initialized then
-    settings.setup()
-  end
+	if not settings.initialized then
+		settings.setup()
+	end
 
 	local prefix = require("telescope.config").values.prompt_prefix or "> "
 	M.prefix_len = #prefix
