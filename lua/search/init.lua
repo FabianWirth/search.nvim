@@ -117,37 +117,37 @@ end
 --- switches to the next tab, preserving the prompt
 --- only switches to tabs that are available
 M.next_tab = function(remember)
-	remember = remember == nil and true or remember
-	M.direction = "next"
-
-	if M.busy then
-		return
-	end
-	util.next_available()
-
-	if remember then
-		M.remember_prompt()
-	end
-
-	open_telescope()
+	M.switch_tab(remember, "next")
 end
 
 --- switches to the previous tab, preserving the prompt
+--- only switches to tabs that are available
 M.previous_tab = function(remember)
+	M.switch_tab(remember, "prev")
+end
+
+M.switch_tab = function(remember, direction)
 	remember = remember == nil and true or remember
-	M.direction = "previous"
+	M.direction = direction
 
-	if M.busy then
-		return
+	-- this might happen, if the user holds down the tab key
+	if M.busy then return end
+
+	local tab_changed = (direction == "next") and util.next_available() or util.previous_available()
+
+	-- it is possible, that no tab is available. in that case we need to error out to avoid an infinite loop
+	if not tab_changed and (not tabs.current():is_available() or tabs.current():has_failed()) then
+		error("No tab is available", 0)
 	end
-	util.previous_available()
 
+	-- remember the prompt, if the caller wants to
 	if remember then
 		M.remember_prompt()
 	end
 
 	open_telescope()
 end
+
 
 --- remembers the prompt that was used before
 M.remember_prompt = function()
@@ -188,7 +188,6 @@ M.opened_on_win = -1
 --- opens the telescope window with the current prompt
 --- this is the function that should be called from the outside
 M.open = function(opts)
-
 	-- TODO: find a better way to do this
 	-- this is just a workaround to make sure that the settings are initialized
 	-- if the user did not call setup() themselves
@@ -202,7 +201,10 @@ M.open = function(opts)
 	M.reset(opts)
 	M.opened_on_win = vim.api.nvim_get_current_win()
 	M.busy = true
-	open_telescope()
+	local suc, msg = pcall(open_telescope)
+	if not suc then
+		vim.api.nvim_out_write("Could not open search window - \"" .. msg .. "\"\n")
+	end
 end
 
 -- configuration

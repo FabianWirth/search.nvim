@@ -45,31 +45,31 @@ M.set_keymap = function()
 end
 
 --- switches to the next available tab
---- @return Tab # the next available tab
+--- @return boolean # whether a tab was found
 M.next_available = function()
 	local start = tabs.current().id
 	while true do
 		local tab = tabs.next()
 		if tab:is_available() then
-			return tab
+			return true
 		end
 		if tab.id == start then
-			return tab
+			return false
 		end
 	end
 end
 
 --- switches to the previous available tab
---- @return Tab # the previous available tab
+--- @return boolean # the previous available tab
 M.previous_available = function()
 	local start = tabs.current().id
 	while true do
 		local tab = tabs.previous()
 		if tab:is_available() then
-			return tab
+			return true
 		end
 		if tab.id == start then
-			return tab
+			return false
 		end
 	end
 end
