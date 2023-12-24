@@ -9,7 +9,7 @@ function TabCollection:new(opts)
 		local tab = Tab:new(t, id)
 		tab_list[id] = tab
 	end
-	local id = opts.initial_id or 1
+	local id = opts.initial_tab or 1
 
 	local o = {
 		tab_list = tab_list,
