@@ -38,11 +38,16 @@ M.setup = function(opts)
 	-- but it's better to be safe than sorry
 	local tabs = vim.deepcopy(M.defaults)
 	local initial_tab = M.default_initial_tab
+	local collections = {}
 
 	-- if the user has specified a custom list of tabs, use that instead
 	-- of the default
 	if opts.tabs ~= nil then
 		tabs = opts.tabs
+	end
+
+	if opts.collections ~= nil then
+		collections = opts.collections
 	end
 
 	-- if the user has specified a custom list of tabs to append, append
@@ -71,6 +76,7 @@ M.setup = function(opts)
 
 	require("search.tabs").init({
 		tabs = tabs,
+		collections = collections,
 		initial_id = initial_tab,
 	})
 

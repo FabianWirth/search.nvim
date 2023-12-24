@@ -42,10 +42,13 @@ To open the search.nvim window, use the following command:
 require('search').open()
 ```
 This will activate the default tab and open the Telescope window with the specified layout.
-it is also possible to provide a tab_id or tab_name to directly activate a specific tab (id takes precedence over name)
+it is also possible to provide a tab_id or tab_name to directly activate a specific tab (id takes precedence over name).
+Any tab collections defined can also be accessed via the collection key.
+
 ```lua
 require('search').open({ tab_id = 2 })
 require('search').open({ tab_name = 'Grep' }) -- if multiple tabs are named the same, the first is selected
+require('search').open({ collection = 'git' }) -- Open the 'git' collection of pickers
 ```
 
 ### Switching Tabs
@@ -78,23 +81,48 @@ require("search").setup({
   -- its also possible to overwrite the default tabs using the tabs key instead of append_tabs
   tabs = {
     {
-	  "Files",
-	  function(opts)
-	    opts = opts or {}
-		if vim.fn.isdirectory(".git") == 1 then
-		  builtin.git_files(opts)
-		else
-		  builtin.find_files(opts)
-		end
-	  end
+      "Files",
+      function(opts)
+        opts = opts or {}
+        if vim.fn.isdirectory(".git") == 1 then
+          builtin.git_files(opts)
+        else
+          builtin.find_files(opts)
+        end
+      end
+    }
+  },
+})
+```
+
+### Tab Collections
+If you want to group certain pickers together into separate search windows you can use the collections keyword:
+
+```lua
+local builtin = require('telescope.builtin')
+require("search").setup({
+  tabs = {
+    initial_tab = 1,
+    tabs = { ... } -- As shown above
+  },
+  collections = {
+    -- Here the "git" collection is defined. It follows the same configuraton layout as tabs.
+    git = {
+      initial_tab = 1, -- Git branches
+      tabs = {
+        { name = "Branches", tele_func = builtin.git_branches },
+        { name = "Commits", tele_func = builtin.git_commits },
+        { name = "Stashes", tele_func = builtin.git_stash },
+      }
     }
   }
 })
-```
+``` 
 
 ### known issues
 - pickers with more-than-average loading time (like lsp related, or http sending pickers) can feel a bit off, since the UI will wait for them to be ready.
 - heavily custom configured telescope settings (like in many nvim distros) might lead to unexpected errors, please open an issue if you encounter any.
+- A window with no available pickers can cause neovim to hang.
 
 ## License
 

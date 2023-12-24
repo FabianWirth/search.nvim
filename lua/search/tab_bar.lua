@@ -25,7 +25,8 @@ M.create = function(conf)
 end
 
 M.make = function(buf_id, max_width)
-	local tabs = tabs_module.all()
+	local collection = tabs_module.current_collection()
+	local tabs = collection:all()
 
 	local current_row = ""
 	local content = {}
@@ -42,7 +43,7 @@ M.make = function(buf_id, max_width)
 		end
 
 		local group = "";
-		if tab:is_current() then
+		if tab:is_current(collection) then
 			group = "ActiveSearchTab"
 		end
 		if tab:has_failed() then
