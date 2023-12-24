@@ -4,18 +4,6 @@ local tabs_module = require("search.tabs")
 
 M.seperator = "|"
 
-M.active_tab_fg = "#000000"
-M.active_tab_bg = "#5558b5"
-M.active_tab_gui = "bold"
-
-M.failed_tab_fg = "#ff9980"
-M.failed_tab_gui = "bold"
-
-M.inactive_tab_fg = "#404040"
-
-M.waiting_tab_fg = "yellow"
-
-
 M.create = function(conf)
 	local buf_id = vim.api.nvim_create_buf(false, true)
 	local max_width = conf.width
@@ -71,10 +59,11 @@ M.make = function(buf_id, max_width)
 	end
 
 	vim.api.nvim_buf_set_lines(buf_id, 0, -1, false, content)
-	vim.cmd("hi! ActiveSearchTab guifg=" .. M.active_tab_fg .. " guibg=" .. M.active_tab_bg .. " gui=" .. M.active_tab_gui)
-	vim.cmd("hi! FailedSearchTab guifg=" .. M.failed_tab_fg .. " gui=" .. M.failed_tab_gui)
-	vim.cmd("hi! InactiveSearchTab guifg=" .. M.inactive_tab_fg)
-	vim.cmd("hi! WaitingSearchTab guifg=" .. M.waiting_tab_fg)
+	-- Other highlight groups can be found at https://neovim.io/doc/user/syntax.html#%3Ahighlight
+	vim.api.nvim_set_hl(0, 'ActiveSearchTab', vim.api.nvim_get_hl(0, {name="IncSearch"}))
+	vim.api.nvim_set_hl(0, 'FailedSearchTab', vim.api.nvim_get_hl(0, {name="Error"}))
+	vim.api.nvim_set_hl(0, 'InactiveSearchTab', vim.api.nvim_get_hl(0, {name="Conceal"}))
+	vim.api.nvim_set_hl(0, 'WaitingSearchTab', vim.api.nvim_get_hl(0, {name="PmenuKind"}))
 	for _, group in ipairs(hil_groups) do
 		vim.api.nvim_buf_add_highlight(buf_id, -1, group.g, group.r, group.s, group.e)
 	end
