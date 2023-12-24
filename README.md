@@ -122,7 +122,6 @@ require("search").setup({
 ### known issues
 - pickers with more-than-average loading time (like lsp related, or http sending pickers) can feel a bit off, since the UI will wait for them to be ready.
 - heavily custom configured telescope settings (like in many nvim distros) might lead to unexpected errors, please open an issue if you encounter any.
-- A window with no available pickers can cause neovim to hang.
 
 ## License
 
