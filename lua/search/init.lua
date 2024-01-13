@@ -46,6 +46,7 @@ local open_telescope = function()
 	M.busy = true
 	local tab = tabs.current()
 	local prompt = M.current_prompt
+	local mode = vim.api.nvim_get_mode().mode
 
 	-- since some telescope functions are linked to lsp, we need to make sure that we are in the correct buffer
 	-- this would become an issue if we are coming from another tab
@@ -82,6 +83,15 @@ local open_telescope = function()
 
 			-- now we set the prompt to the one we had before
 			vim.api.nvim_feedkeys(prompt, 't', true)
+
+			-- If keymaps for navigating panes are defined in normal mode, the prompt should remain in normal mode to allow
+			-- navigating multiple maps at a time.
+			-- If the mode was normal mode before the tab change, then change back to normal mode. This is unless the search
+			-- is being opened using open(), since then then user could be using normal mode in their previous active buffer.
+			if mode == "n" and M.opened_from_buffer == false then
+				vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Esc>", true, false, true), 'n', false)
+			end
+			M.opened_from_buffer = false
 
 			-- TODO: find a better way to do this - defer_fn will work, but will also cause some kind of redrawing
 			-- using vim.wait(n) does not work
@@ -176,6 +186,7 @@ M.reset = function(opts)
 
 	M.current_prompt = ""
 	M.opened_on_win = -1
+	M.opened_from_buffer = true
 end
 
 -- the prefix can be defined in the telescope config, so we need to read
@@ -184,6 +195,8 @@ end
 M.prefix_len = 2
 
 M.opened_on_win = -1
+
+M.opened_from_buffer = true
 
 --- opens the telescope window with the current prompt
 --- this is the function that should be called from the outside
@@ -202,6 +215,7 @@ M.open = function(opts)
 	M.reset(opts)
 	M.opened_on_win = vim.api.nvim_get_current_win()
 	M.busy = true
+	M.opened_from_buffer = true
 	open_telescope()
 end
 

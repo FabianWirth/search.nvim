@@ -38,10 +38,13 @@ M.set_keymap = function()
 	local opts = { noremap = true, silent = true }
 	local cmd = "<cmd>lua require('search').next_tab()<CR>"
 	local cmd_p = "<cmd>lua require('search').previous_tab()<CR>"
-	vim.api.nvim_buf_set_keymap(0, 'n', settings.keys.next, cmd, opts)
-	vim.api.nvim_buf_set_keymap(0, 'i', settings.keys.next, cmd, opts)
-	vim.api.nvim_buf_set_keymap(0, 'n', settings.keys.prev, cmd_p, opts)
-	vim.api.nvim_buf_set_keymap(0, 'i', settings.keys.prev, cmd_p, opts)
+
+	for _, value in ipairs(settings.keys.next) do
+		vim.api.nvim_buf_set_keymap(0, value[2], value[1], cmd, opts)
+	end
+	for _, value in ipairs(settings.keys.prev) do
+		vim.api.nvim_buf_set_keymap(0, value[2], value[1], cmd_p, opts)
+	end
 end
 
 --- switches to the next available tab
