@@ -12,7 +12,7 @@
 - **Tab-based Searching**: Easily switch between different search modes, each represented by a tab.
 - **Integration with Telescope**: Leverages the power of the Telescope plugin for versatile searching.
 - **Customizable Tabs**: Configure the available tabs according to your preferences. (coming soon)
-- **keybindings for switching tabs**: switch tabs by configurable keys (coming soon)
+- **keybindings for switching tabs**: switch tabs by configurable keys
 
 ## Installation
 
@@ -95,16 +95,31 @@ require("search").setup({
 })
 ```
 
+### Customizing key bindings
+Simple rebind, will bind the the keys in both normal mode and insert mode.
+```lua
+  mappings = {
+    next = "<Tab>",
+    prev = "<S-Tab>"
+  }
+```
+You can also bind keys in specific modes by supplying a list of key-mode pairs. The following would bind H and L to previous and next in normal mode
+in addition to binding tab and shift+tab like in the example above.
+```lua
+  mappings = {
+    next = { { "L", "n" }, { "<Tab>", "n" }, { "<Tab>", "i" } },
+    prev = { { "H", "n" }, { "<S-Tab>", "n" }, { "<S-Tab>", "i" } }
+  }
+```
+
 ### Tab Collections
 If you want to group certain pickers together into separate search windows you can use the collections keyword:
 
 ```lua
 local builtin = require('telescope.builtin')
 require("search").setup({
-  tabs = {
-    initial_tab = 1,
-    tabs = { ... } -- As shown above
-  },
+  initial_tab = 1,
+  tabs = { ... }, -- As shown above
   collections = {
     -- Here the "git" collection is defined. It follows the same configuraton layout as tabs.
     git = {
