@@ -5,8 +5,8 @@ M.default_initial_tab = 1
 M.initialized = false
 
 M.default_keys = {
-	next = "<Tab>",
-	prev = "<S-Tab>",
+	next = { { "<Tab>", "n" }, { "<Tab>", "i" } },
+	prev = { { "<S-Tab>", "n" }, { "<S-Tab>", "i" } },
 }
 
 M.keys = vim.deepcopy(M.default_keys)
